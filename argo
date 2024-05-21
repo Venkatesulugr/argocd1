@@ -1,36 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-app
+  name: argocd-dex-server
+  namespace: argocd
   labels:
-    app: web-app
+    app: argocd
+    component: dex-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: web-app
+      app: argocd
+      component: dex-server
   template:
     metadata:
       labels:
-        app: web-app
+        app: argocd
+        component: dex-server
     spec:
       containers:
-        - name: web-app
-          image: nginx:latest
+        - name: argocd-dex-server
+          image: quay.io/dexidp/dex:v2.27.0
           ports:
-            - containerPort: 80
-.....
+            - containerPort: 5556
+              name: http
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-app-service
+  name: argocd-dex-server
+  namespace: argocd
   labels:
-    app: web-app
+    app: argocd
+    component: dex-server
 spec:
   selector:
-    app: web-app
+    app: argocd
+    component: dex-server
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+    - name: http
+      port: 5556
+      targetPort: 5556
   type: NodePort
